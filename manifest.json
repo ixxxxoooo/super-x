@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Super X - 右侧分栏查看帖子详情",
+  "version": "1.0.0",
+  "description": "在 X (Twitter) 列表点击帖子卡片时，直接在右侧分栏打开帖子详情与评论，无需离开当前时间线列表。",
+  "permissions": [
+    "declarativeNetRequest",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.x.com/*",
+    "*://x.com/*",
+    "*://*.twitter.com/*",
+    "*://twitter.com/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "framing_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.x.com/*",
+        "*://x.com/*",
+        "*://*.twitter.com/*",
+        "*://twitter.com/*"
+      ],
+      "js": ["page-bridge.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://*.x.com/*",
+        "*://x.com/*",
+        "*://*.twitter.com/*",
+        "*://twitter.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Super X 分栏设置",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

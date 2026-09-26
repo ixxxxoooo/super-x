@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Super X 设置</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 280px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0f1419;
+      color: #e7e9ea;
+      padding: 16px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #2f3336;
+      margin-bottom: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .badge {
+      font-size: 11px;
+      background: rgba(29, 155, 240, 0.15);
+      color: #1d9bf0;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .label-title {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .label-desc {
+      font-size: 11.5px;
+      color: #71767b;
+      margin-top: 2px;
+    }
+    /* Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #3e4144;
+      transition: 0.2s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #1d9bf0;
+    }
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+    .tips {
+      margin-top: 12px;
+      padding: 10px;
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #8b98a5;
+      line-height: 1.5;
+    }
+    .btn-reset {
+      margin-top: 10px;
+      width: 100%;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid #2f3336;
+      background: transparent;
+      color: #e7e9ea;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-reset:hover {
+      background: rgba(231, 233, 234, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <span>Super X 分栏详情</span>
+    </div>
+    <span class="badge">v1.0</span>
+  </div>
+
+  <div class="row">
+    <div>
+      <div class="label-title">启用右侧详情分栏</div>
+      <div class="label-desc">点击列表卡片在右侧直接查看</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="toggle-enabled" checked />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <button type="button" class="btn-reset" id="btn-reset-width">重置右侧分栏宽度为自适应</button>
+
+  <div class="tips">
+    • 点击左侧帖子卡片即可在右侧展开详情与评论<br/>
+    • 拖动分栏左边缘可自由调节宽度<br/>
+    • 按 <b>Esc</b> 或点击左上角 <b>←</b> 可关闭详情栏
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

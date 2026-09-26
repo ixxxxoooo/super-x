@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Super X - Stylesheet (Parent Timeline Split-View & Detail Iframe Mode)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. IFRAME MODE: Inside the Right-Side Detail Panel (`superx-detail-iframe`)
+   -------------------------------------------------------------------------- */
+html.superx-iframe-mode {
+  overflow-x: hidden !important;
+}
+
+/* Hide left navigation sidebar, right sidebar, DM drawer, Grok button, bottom bar */
+html.superx-iframe-mode header[role="banner"],
+html.superx-iframe-mode [data-testid="sidebarColumn"],
+html.superx-iframe-mode [data-testid="DMDrawer"],
+html.superx-iframe-mode [data-testid="GrokDrawer"],
+html.superx-iframe-mode [data-testid="BottomBar"],
+html.superx-iframe-mode a[data-testid="SideNav_NewTweet_Button"],
+html.superx-iframe-mode [data-testid="fab-button"],
+html.superx-iframe-mode div[aria-label="Grok"] {
+  display: none !important;
+}
+
+/* Stretch main and primaryColumn to 100% of the right panel width */
+html.superx-iframe-mode main[role="main"] {
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex-grow: 1 !important;
+}
+
+html.superx-iframe-mode main[role="main"] > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.superx-iframe-mode [data-testid="primaryColumn"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Leave breathing room on the top-right of the sticky "<- 帖子" header bar for panel buttons */
+html.superx-iframe-mode [data-testid="primaryColumn"] > div > div:first-child {
+  padding-right: 76px !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. PARENT WINDOW MODE: Split Layout & Right Detail Panel
+   -------------------------------------------------------------------------- */
+
+/* Ensure X's native modals, lightboxes, and dropdown menus (#layers) stay above the panel */
+html:not(.superx-iframe-mode) #layers {
+  z-index: 50 !important;
+}
+
+/* Make tweet cards in the primary column clearly feel clickable */
+html:not(.superx-iframe-mode) [data-testid="primaryColumn"] article[data-testid="tweet"] {
+  cursor: pointer;
+}
+
+/* On medium screens, reclaim wasted left margin when the right detail panel is open */
+@media (max-width: 1560px) and (min-width: 1000px) {
+  html.superx-split-active:not(.superx-iframe-mode) header[role="banner"] {
+    flex-grow: 0 !important;
+    padding-left: 8px !important;
+  }
+}
+
+/* Hide the underlying right sidebar column while the detail panel is active */
+html.superx-split-active:not(.superx-iframe-mode) [data-testid="sidebarColumn"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease;
+}
+
+/* Right Detail Panel Container */
+#superx-detail-panel.superx-panel {
+  --superx-bg: #ffffff;
+  --superx-border: rgb(239, 243, 244);
+  --superx-text: rgb(15, 20, 25);
+  --superx-btn-bg: rgba(255, 255, 255, 0.85);
+  --superx-btn-hover: rgba(15, 20, 25, 0.08);
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  z-index: 4;
+  background-color: var(--superx-bg);
+  border-left: 1px solid var(--superx-border);
+  border-right: 1px solid var(--superx-border);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.16s;
+}
+
+#superx-detail-panel.superx-theme-dark {
+  --superx-border: rgb(47, 51, 54);
+  --superx-text: rgb(231, 233, 234);
+  --superx-btn-bg: rgba(0, 0, 0, 0.65);
+  --superx-btn-hover: rgba(231, 233, 234, 0.12);
+}
+
+/* Panel Open vs Closed States (never use display:none so prewarmed iframe retains full dimensions) */
+#superx-detail-panel.superx-panel-closed {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(10px);
+}
+
+#superx-detail-panel.superx-panel-open {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateX(0);
+}
+
+/* Disable pointer events on iframe while dragging resize handle for smooth drag */
+#superx-detail-panel.superx-resizing {
+  transition: none !important;
+  user-select: none !important;
+}
+
+#superx-detail-panel.superx-resizing .superx-iframe {
+  pointer-events: none !important;
+}
+
+/* Left Border Drag-Resize Handle */
+.superx-resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  width: 7px;
+  cursor: col-resize;
+  z-index: 15;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.superx-resize-handle:hover,
+#superx-detail-panel.superx-resizing .superx-resize-handle {
+  background-color: rgba(29, 155, 240, 0.55);
+}
+
+/* Top Progress Indicator Bar */
+.superx-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 0%;
+  background: rgb(29, 155, 240);
+  z-index: 14;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.superx-progress-bar.superx-progress-active {
+  width: 78%;
+  opacity: 1;
+  transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.1s ease;
+}
+
+.superx-progress-bar.superx-progress-done {
+  width: 100%;
+  opacity: 0;
+  transition: width 0.15s ease, opacity 0.2s ease 0.05s;
+}
+
+/* Floating Quick Action Buttons (Aligned with X's 53px sticky top header) */
+.superx-floating-toolbar {
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.superx-tool-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1px solid var(--superx-border);
+  background: var(--superx-btn-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--superx-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.superx-tool-btn:hover {
+  background: var(--superx-btn-hover);
+}
+
+.superx-tool-btn:active {
+  transform: scale(0.94);
+}
+
+/* Embedded Iframe */
+.superx-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  flex: 1;
+  display: block;
+  background-color: transparent;
+}
+
+/* Initial Loading Overlay */
+.superx-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--superx-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: opacity 0.18s ease;
+}
+
+.superx-loading-overlay.superx-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.superx-spinner {
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid rgba(29, 155, 240, 0.2);
+  border-top-color: rgb(29, 155, 240);
+  border-radius: 50%;
+  animation: superx-spin 0.65s linear infinite;
+}
+
+@keyframes superx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
