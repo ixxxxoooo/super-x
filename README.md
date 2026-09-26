@@ -17,8 +17,11 @@
 
 ## 安装方式
 
-1. 打开 Chrome / Edge / Brave / Arc 浏览器，访问扩展管理页：`chrome://extensions/`
-2. 打开右上角的 **「开发者模式」(Developer mode)** 开关。
-3. 点击左上角的 **「加载已解压的扩展程序」(Load unpacked)**。
-4. 选择本项目所在目录：`/Users/liwenjiao/super-x`。
+1. 克隆或下载本仓库到本地：
+   ```bash
+   git clone https://github.com/ixxxxoooo/super-x.git
+   ```
+2. 打开 Chrome / Edge / Brave / Arc 浏览器，访问扩展管理页：`chrome://extensions/`
+3. 打开右上角的 **「开发者模式」(Developer mode)** 开关。
+4. 点击左上角的 **「加载已解压的扩展程序」(Load unpacked)**，选择克隆下来的 `super-x` 文件夹。
 5. 打开或刷新 [`https://x.com/home`](https://x.com/home)，点击左侧任意帖子卡片即可在右侧查看详情！
