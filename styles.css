@@ -51,13 +51,26 @@ html.superx-iframe-mode [data-testid="primaryColumn"] > div > div:first-child {
   padding-right: 76px !important;
 }
 
+/* When viewing a photo modal inside the iframe, hide the redundant right comment sidebar so the image gets full width */
+html.superx-iframe-mode #layers [role="dialog"] [data-testid="swipe-to-dismiss"] ~ div {
+  display: none !important;
+}
+
 /* --------------------------------------------------------------------------
    2. PARENT WINDOW MODE: Split Layout & Right Detail Panel
    -------------------------------------------------------------------------- */
 
-/* Ensure X's native modals, lightboxes, and dropdown menus (#layers) stay above the panel */
+/* Release X's root z-index:0 stacking context trap (.r-417010) so #layers can stack above #superx-detail-panel */
+html:not(.superx-iframe-mode) #react-root,
+html:not(.superx-iframe-mode) #react-root > div,
+html:not(.superx-iframe-mode) #react-root > div > div {
+  z-index: auto !important;
+}
+
+/* Ensure X's native modals, lightboxes, and dropdown menus (#layers) always stay above the panel */
 html:not(.superx-iframe-mode) #layers {
-  z-index: 50 !important;
+  position: relative;
+  z-index: 9999 !important;
 }
 
 /* Make tweet cards in the primary column clearly feel clickable */
@@ -125,6 +138,30 @@ html.superx-split-active:not(.superx-iframe-mode) [data-testid="sidebarColumn"] 
   visibility: visible !important;
   pointer-events: auto !important;
   transform: translateX(0);
+}
+
+/* Automatically hide the right panel while a fullscreen image lightbox or modal dialog is open on the main page */
+html:not(.superx-iframe-mode):has(#layers [role="dialog"]) #superx-detail-panel.superx-panel-open,
+html:not(.superx-iframe-mode):has(#layers [data-testid="swipe-to-dismiss"]) #superx-detail-panel.superx-panel-open,
+html:not(.superx-iframe-mode):has(#layers [aria-modal="true"]) #superx-detail-panel.superx-panel-open,
+html.superx-parent-modal-open:not(.superx-iframe-mode) #superx-detail-panel.superx-panel-open {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* When a photo/media modal is opened inside the right detail panel, expand to full screen for unobstructed viewing */
+#superx-detail-panel.superx-panel-open.superx-iframe-modal-open {
+  left: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  z-index: 10000 !important;
+  border-left: none !important;
+}
+
+#superx-detail-panel.superx-iframe-modal-open .superx-floating-toolbar,
+#superx-detail-panel.superx-iframe-modal-open .superx-resize-handle {
+  display: none !important;
 }
 
 /* Disable pointer events on iframe while dragging resize handle for smooth drag */

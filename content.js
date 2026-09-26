@@ -17,14 +17,46 @@
     // Immediately apply iframe class at document_start so sidebar/nav never flash
     document.documentElement.classList.add('superx-iframe-mode');
 
+    let lastModalOpen = false;
+    function checkIframeModalState() {
+      const hasDialog = Boolean(
+        document.querySelector(
+          '#layers [role="dialog"], #layers [data-testid="swipe-to-dismiss"], #layers [aria-modal="true"]'
+        ) || /\/status\/\d+\/(?:photo|video)\//.test(window.location.pathname)
+      );
+      if (hasDialog !== lastModalOpen) {
+        lastModalOpen = hasDialog;
+        window.parent.postMessage(
+          { type: 'SUPERX_IFRAME_MODAL_STATE', open: hasDialog },
+          '*'
+        );
+      }
+    }
+
+    const startIframeObserver = () => {
+      checkIframeModalState();
+      if (document.body) {
+        new MutationObserver(checkIframeModalState).observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startIframeObserver);
+    } else {
+      startIframeObserver();
+    }
+
     // Sync theme background and watch Escape key
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         // Only close the panel if no modal/lightbox is open inside the iframe
         const hasOpenModal = document.querySelector(
-          '#layers [role="dialog"], #layers [data-testid="mask"]'
+          '#layers [role="dialog"], #layers [data-testid="mask"], #layers [data-testid="swipe-to-dismiss"]'
         );
-        if (!hasOpenModal) {
+        if (!hasOpenModal && !lastModalOpen) {
           window.parent.postMessage({ type: 'SUPERX_CLOSE_PANEL' }, '*');
         }
       }
@@ -460,6 +492,10 @@
       closePanel();
     } else if (data.type === 'SUPERX_OPEN_FROM_ROUTER_GUARD' && data.url) {
       openStatusInPanel(data.url, data.statusId);
+    } else if (data.type === 'SUPERX_IFRAME_MODAL_STATE') {
+      if (panelEl) {
+        panelEl.classList.toggle('superx-iframe-modal-open', Boolean(data.open));
+      }
     }
   });
 
@@ -630,9 +666,11 @@
   // Close panel on Escape key in parent window
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isPanelOpen) {
-      const hasOpenModal = document.querySelector(
-        '#layers [role="dialog"], #layers [data-testid="mask"]'
-      );
+      const hasOpenModal =
+        document.querySelector(
+          '#layers [role="dialog"], #layers [data-testid="mask"], #layers [data-testid="swipe-to-dismiss"]'
+        ) ||
+        (panelEl && panelEl.classList.contains('superx-iframe-modal-open'));
       if (!hasOpenModal) {
         closePanel();
       }
@@ -647,6 +685,18 @@
     updatePanelGeometry();
   });
 
+  function syncParentModalState() {
+    const hasParentModal = Boolean(
+      document.querySelector(
+        '#layers [role="dialog"], #layers [data-testid="swipe-to-dismiss"], #layers [aria-modal="true"]'
+      ) || /\/status\/\d+\/(?:photo|video)\//.test(window.location.pathname)
+    );
+    document.documentElement.classList.toggle(
+      'superx-parent-modal-open',
+      hasParentModal
+    );
+  }
+
   function observeLayoutChanges() {
     const primaryCol = document.querySelector('[data-testid="primaryColumn"]');
     if (primaryCol && primaryCol !== observedPrimaryCol) {
@@ -657,6 +707,7 @@
       // Prewarm the detail iframe once primaryColumn is present on the page
       setTimeout(prewarmIframeIfNeeded, 800);
     }
+    syncParentModalState();
     syncThemeFromPage();
   }
 
